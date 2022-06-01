@@ -1,0 +1,76 @@
+name: gitee
+
+on:
+  schedule:
+    - cron: '* */1 * * *'
+  push:
+      branches:
+        - main
+
+jobs:
+  user:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - github: eastck
+            gitee: e-astck
+    steps:
+      - name: Cache src repo
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ github.workspace }}/hub-mirror-cache
+          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
+          restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
+
+      - name: User estack mirror
+        uses: x-actions/git-mirrors@main
+        with:
+          src: github/${{ matrix.github }}
+          src_token: ${{ secrets.GITHUB_TOKEN }}
+          dst: gitee/${{ matrix.gitee }}
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          account_type: user
+          clone_style: ssh
+
+      - name: Print cache path
+        run: |
+          ls -la ${{ github.workspace }}/hub-mirror-cache
+
+  orgs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - github: pncx
+            gitee: pncx
+    steps:
+      - name: Cache src repo
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ github.workspace }}/hub-mirror-cache
+          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
+          restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
+
+      - name: Organization ${{ matrix.github }} mirror
+        uses: x-actions/git-mirrors@main
+        with:
+          src: github/${{ matrix.github }}
+          src_token: ${{ secrets.GITHUB_TOKEN }}
+          dst: gitee/${{ matrix.gitee }}
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          account_type: org
+          clone_style: ssh
+
+      - name: Print cache path
+        run: |
+          dir="${{ github.workspace }}/hub-mirror-cache"
+          if [ -d "${dir}" ]; then
+            ls -la ${dir}
+          else
+            echo "empty"
+          fi
