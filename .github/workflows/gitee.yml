@@ -20,7 +20,7 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ github.workspace }}/hub-mirror-cache
+          path: ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
           key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
@@ -38,7 +38,7 @@ jobs:
 
       - name: Print cache path
         run: |
-          ls -la ${{ github.workspace }}/hub-mirror-cache
+          ls -la ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
 
   orgs:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ github.workspace }}/hub-mirror-cache
+          path: ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
           key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
@@ -70,7 +70,7 @@ jobs:
 
       - name: Print cache path
         run: |
-          dir="${{ github.workspace }}/hub-mirror-cache"
+          dir="${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}"
           if [ -d "${dir}" ]; then
             ls -la ${dir}
           else
