@@ -25,7 +25,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
       - name: User estack mirror
-        uses: x-actions/git-mirrors@main
+        uses: x-actions/git-mirrors@dev
         with:
           src: github/${{ matrix.github }}
           src_token: ${{ secrets.GITHUB_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
       - name: Organization ${{ matrix.github }} mirror
-        uses: x-actions/git-mirrors@main
+        uses: x-actions/git-mirrors@dev
         with:
           src: github/${{ matrix.github }}
           src_token: ${{ secrets.GITHUB_TOKEN }}
