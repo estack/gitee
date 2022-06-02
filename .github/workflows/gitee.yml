@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - github: eastck
+          - github: estack
             gitee: e-astck
     steps:
       - name: Cache src repo
