@@ -20,8 +20,8 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
-          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
+          path: ${{ github.workspace }}/git-mirrors-cache
+          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}-${{ matrix.github }}
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
       - name: User estack mirror
@@ -38,7 +38,12 @@ jobs:
 
       - name: Print cache path
         run: |
-          ls -la ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
+          dir="${{ github.workspace }}/git-mirrors-cache"
+          if [ -d "${dir}" ]; then
+            ls -la ${dir}
+          else
+            echo "empty"
+          fi
 
   orgs:
     runs-on: ubuntu-latest
@@ -52,8 +57,8 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}
-          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
+          path: ${{ github.workspace }}/git-mirrors-cache
+          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}-${{ matrix.github }}
           restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
       - name: Organization ${{ matrix.github }} mirror
@@ -70,7 +75,7 @@ jobs:
 
       - name: Print cache path
         run: |
-          dir="${{ github.workspace }}/git-mirrors-cache-${{ matrix.github }}"
+          dir="${{ github.workspace }}/git-mirrors-cache"
           if [ -d "${dir}" ]; then
             ls -la ${dir}
           else
