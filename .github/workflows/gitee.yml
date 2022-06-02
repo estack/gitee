@@ -14,7 +14,7 @@ jobs:
       matrix:
         include:
           - github: estack
-            gitee: e-astck
+            gitee: e-stack
     steps:
       - name: Cache src repo
         uses: actions/cache@v3
