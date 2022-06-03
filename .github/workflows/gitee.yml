@@ -28,7 +28,7 @@ jobs:
         uses: x-actions/git-mirrors@main
         with:
           src: github/${{ matrix.github }}
-          src_token: ${{ secrets.GITHUB_TOKEN }}
+          src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           dst: gitee/${{ matrix.gitee }}
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
           dst_token: ${{ secrets.GITEE_TOKEN }}
@@ -65,7 +65,7 @@ jobs:
         uses: x-actions/git-mirrors@main
         with:
           src: github/${{ matrix.github }}
-          src_token: ${{ secrets.GITHUB_TOKEN }}
+          src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           dst: gitee/${{ matrix.gitee }}
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
           dst_token: ${{ secrets.GITEE_TOKEN }}
