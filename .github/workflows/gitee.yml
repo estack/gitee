@@ -2,7 +2,7 @@ name: gitee
 
 on:
   schedule:
-    - cron: '* */1 * * *'
+    - cron: '* * * */3 *'
   push:
       branches:
         - main
