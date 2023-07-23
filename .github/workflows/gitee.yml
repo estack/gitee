@@ -1,11 +1,21 @@
 name: gitee
 
 on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'run action reason'
+        required: false
+        type: string
+        default: 'manually test'
   schedule:
-    - cron: '* * * */3 *'
+    - cron: '5 0 */6 * *'
   push:
       branches:
         - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   user:
@@ -13,71 +23,88 @@ jobs:
     strategy:
       matrix:
         include:
-          - github: estack
-            gitee: e-stack
+        - github: estack
+          gitee: e-stack
     steps:
-      - name: Cache src repo
-        uses: actions/cache@v3
-        id: cache
-        with:
-          path: ${{ github.workspace }}/git-mirrors-cache
-          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
-          restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
+    - name: Cache src repo
+      uses: actions/cache@v3
+      id: cache
+      with:
+        path: ${{ github.workspace }}/git-mirrors-cache
+        key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
+        restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
 
-      - name: User estack mirror
-        uses: x-actions/git-mirrors@main
-        with:
-          src: github/${{ matrix.github }}
-          src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          dst: gitee/${{ matrix.gitee }}
-          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-          dst_token: ${{ secrets.GITEE_TOKEN }}
-          account_type: user
-          clone_style: ssh
-          debug: true
+    - name: User estack mirror
+      uses: x-actions/git-mirrors@main
+      with:
+        src: github/${{ matrix.github }}
+        src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        dst: gitee/${{ matrix.gitee }}
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+        dst_token: ${{ secrets.GITEE_TOKEN }}
+        account_type: user
+        clone_style: ssh
+        debug: true
 
-      - name: Print cache path
-        run: |
-          dir="${{ github.workspace }}/git-mirrors-cache"
-          if [ -d "${dir}" ]; then
-            tree -L 2 ${dir}
-          else
-            echo "empty"
-          fi
+    - name: Print cache path
+      run: |
+        dir="${{ github.workspace }}/git-mirrors-cache"
+        if [ -d "${dir}" ]; then
+          tree -L 2 ${dir}
+        else
+          echo "empty"
+        fi
 
   orgs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - github: pncx
-            gitee: pncx
+        - github: pncx
+          gitee: pncx
+        - github: argoproj
+          gitee: argoproj
+        - github: facebookresearch
+          gitee: facebookresearch
+        - github: influxdata
+          gitee: influxdata
+        - github: istio
+          gitee: x-istio
+        - github: kubernetes
+          gitee: x-kubernetes
     steps:
-      - name: Cache src repo
-        uses: actions/cache@v3
-        id: cache
-        with:
-          path: ${{ github.workspace }}/git-mirrors-cache
-          key: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-${{ steps.info.outputs.time }}
-          restore-keys: ${{ runner.os }}-${{ steps.info.outputs.key }}-cache-
+    - name: Cache src repo
+      uses: actions/cache@v3
+      id: cache-src-repo
+      with:
+        path: ${{ github.workspace }}/git-mirrors-cache
+        key: ${{ runner.os }}-${{ matrix.github }}-cache
+        restore-keys: ${{ runner.os }}-${{ matrix.github }}-cache
 
-      - name: Organization ${{ matrix.github }} mirror
-        uses: x-actions/git-mirrors@main
-        with:
-          src: github/${{ matrix.github }}
-          src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          dst: gitee/${{ matrix.gitee }}
-          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-          dst_token: ${{ secrets.GITEE_TOKEN }}
-          account_type: org
-          clone_style: ssh
-          debug: true
+    - name: Organization ${{ matrix.github }} mirror
+      if: ${{ always() }}
+      uses: x-actions/git-mirrors@main
+      with:
+        src: github/${{ matrix.github }}
+        src_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        dst: gitee/${{ matrix.gitee }}
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+        dst_token: ${{ secrets.GITEE_TOKEN }}
+        account_type: org
+        clone_style: ssh
+        debug: true
 
-      - name: Print cache path
-        run: |
-          dir="${{ github.workspace }}/git-mirrors-cache"
-          if [ -d "${dir}" ]; then
-            tree -L 2 ${dir}
-          else
-            echo "empty"
-          fi
+    - name: Print cache path
+      continue-on-error: true
+      run: |
+        set -x
+        echo "whoami is `whoami`"
+        dir="${{ github.workspace }}/git-mirrors-cache"
+        if [ -d "${dir}" ]; then
+          chmod a+r -R ${dir}
+          ls -lhart ${dir}
+          tree -L 2 ${dir}
+          du -lh -d 1
+        else
+          echo "empty"
+        fi
